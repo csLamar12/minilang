@@ -1,4 +1,4 @@
-# MiniLang Programming Language
+# NovaScript Programming Language
 
 A mini programming language with a complete compiler implementation in Python using PLY (Python Lex-Yacc).
 

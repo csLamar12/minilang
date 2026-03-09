@@ -1,5 +1,5 @@
 """
-llm_runner.py — LLM integration for the MiniLang Compiler
+llm_runner.py — LLM integration for the NovaScript Compiler
 CIT4004 · University of Technology, Jamaica
 
 Uses the Google Gemini API (free tier — no credit card required).
@@ -7,7 +7,7 @@ Requires:
     pip install google-genai
 
 Get a FREE API key at https://aistudio.google.com/app/apikey
-Then save it via Tools -> Settings in the MiniLang app.
+Then save it via Tools -> Settings in the NovaScript app.
 """
 
 import os
@@ -15,11 +15,11 @@ import os
 # ── System prompt ─────────────────────────────────────────────────────────────
 
 _SYSTEM_PROMPT = """\
-You are an expert teaching assistant for MiniLang, a small educational
+You are an expert teaching assistant for NovaScript, a small educational
 programming language used in the CIT4004 Analysis of Programming Languages
 course at the University of Technology, Jamaica.
 
-MiniLang quick reference
+NovaScript quick reference
 ------------------------
 Variables    : let x = value        (declare + initialise)
                x = newValue         (reassign)
@@ -50,8 +50,8 @@ Guidelines
 ----------
 - Be concise and student-friendly.
 - Explain concepts clearly; avoid jargon unless you define it.
-- When you show corrected or example code, use the exact MiniLang syntax above.
-- If the user asks something unrelated to programming or MiniLang, politely
+- When you show corrected or example code, use the exact NovaScript syntax above.
+- If the user asks something unrelated to programming or NovaScript, politely
   redirect them.
 """
 
@@ -73,7 +73,7 @@ def _check_setup() -> "str | None":
             "Fix:\n"
             "    pip install google-genai\n\n"
             "Then get a free API key at: https://aistudio.google.com/app/apikey\n"
-            "and save it via  Tools -> Settings  in the MiniLang app."
+            "and save it via  Tools -> Settings  in the NovaScript app."
         )
     key = os.environ.get("GOOGLE_API_KEY", "").strip()
     if not key:
@@ -83,7 +83,7 @@ def _check_setup() -> "str | None":
             "  1. Go to  https://aistudio.google.com/app/apikey\n"
             "  2. Sign in with a free Google account\n"
             "  3. Click 'Create API Key'\n"
-            "  4. Paste the key via  Tools -> Settings  in the MiniLang app.\n\n"
+            "  4. Paste the key via  Tools -> Settings  in the NovaScript app.\n\n"
             "The Gemini free tier gives you 1,500 requests/day — no credit card needed."
         )
     return None
@@ -155,7 +155,7 @@ def get_ai_response(
 
     Args:
         prompt: The user's question or instruction.
-        code:   (optional) MiniLang source code to include as context.
+        code:   (optional) NovaScript source code to include as context.
         error:  (optional) Error text to include as context.
         model:  Gemini model name (default: gemini-2.0-flash-lite).
 
@@ -172,7 +172,7 @@ def get_ai_response(
     # Build the user message
     parts: list[str] = []
     if code.strip():
-        parts.append(f"MiniLang code:\n```\n{code.strip()}\n```")
+        parts.append(f"NovaScript code:\n```\n{code.strip()}\n```")
     if error.strip():
         parts.append(f"Error message(s):\n{error.strip()}")
     parts.append(prompt)
@@ -198,9 +198,9 @@ def get_ai_response(
 # ── Convenience wrappers ──────────────────────────────────────────────────────
 
 def explain_code(code: str) -> str:
-    """Explain what a MiniLang program does, step by step."""
+    """Explain what a NovaScript program does, step by step."""
     return get_ai_response(
-        "Explain what this MiniLang program does, step by step. "
+        "Explain what this NovaScript program does, step by step. "
         "Be concise and suitable for a first-year student.",
         code=code,
     )
@@ -219,7 +219,7 @@ def explain_errors(code: str, errors: str) -> str:
 def suggest_fix(code: str, errors: str) -> str:
     """Return a corrected version of the code with an explanation."""
     return get_ai_response(
-        "Fix all the errors in this MiniLang code. "
+        "Fix all the errors in this NovaScript code. "
         "Show the complete corrected program and briefly explain every change.",
         code=code,
         error=errors,
@@ -227,16 +227,16 @@ def suggest_fix(code: str, errors: str) -> str:
 
 
 def ask(question: str, code: str = "") -> str:
-    """Answer an arbitrary question about MiniLang or the given code."""
+    """Answer an arbitrary question about NovaScript or the given code."""
     return get_ai_response(question, code=code)
 
 
 # ── CLI smoke-test ────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("MiniLang LLM Runner — quick test (Google Gemini)")
+    print("NovaScript LLM Runner — quick test (Google Gemini)")
     print(f"API available: {api_available()}")
     if api_available():
-        resp = ask("What is MiniLang and what is it used for?")
+        resp = ask("What is NovaScript and what is it used for?")
         print("\n--- Response ---")
         print(resp)

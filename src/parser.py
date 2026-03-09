@@ -1,9 +1,9 @@
 """
-Parser for MiniLang using PLY.
+Parser for NovaScript using PLY.
 Generates Abstract Syntax Tree (AST).
 
 ================================================================================
-MINILANG GRAMMAR (BNF)
+NOVASCRIPT GRAMMAR (BNF)
 ================================================================================
 
 <program>              ::= <statement_list>
@@ -124,15 +124,15 @@ MINILANG GRAMMAR (BNF)
 """
 
 import ply.yacc as yacc
-from lexer import MiniLangLexer
+from lexer import NovaScriptLexer
 from ast_nodes import *
 from error_handler import error_handler
 
-class MiniLangParser:
-    """Parser for the MiniLang programming language."""
+class NovaScriptParser:
+    """Parser for the NovaScript programming language."""
     
     def __init__(self):
-        self.lexer = MiniLangLexer()
+        self.lexer = NovaScriptLexer()
         self.lexer.build()
         self.tokens = self.lexer.tokens
         self.parser = None
@@ -421,7 +421,7 @@ class MiniLangParser:
 
 # For testing
 if __name__ == '__main__':
-    parser = MiniLangParser()
+    parser = NovaScriptParser()
     parser.build()
     
     test_code = """

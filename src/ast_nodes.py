@@ -1,5 +1,5 @@
 """
-Abstract Syntax Tree (AST) node definitions for the MiniLang compiler.
+Abstract Syntax Tree (AST) node definitions for the NovaScript compiler.
 """
 
 class ASTNode:

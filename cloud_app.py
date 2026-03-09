@@ -1,11 +1,11 @@
 """
-cloud_app.py — MiniLang Compiler  (Streamlit Cloud Edition)
+cloud_app.py — NovaScript Compiler  (Streamlit Cloud Edition)
 CIT4004 · University of Technology, Jamaica
 
 Deployable for FREE at https://streamlit.io/cloud
 Run locally:  streamlit run cloud_app.py
 
-This web interface exposes the full MiniLang compiler pipeline
+This web interface exposes the full NovaScript compiler pipeline
 (lexer → parser → semantic analyser → interpreter) plus the
 Gemini-powered AI Assistant, all inside a browser — no installation
 required by end-users.
@@ -25,8 +25,8 @@ if _SRC not in sys.path:
     sys.path.insert(0, _SRC)
 
 # ── Import compiler pipeline ──────────────────────────────────────────────────
-from lexer        import MiniLangLexer
-from parser       import MiniLangParser
+from lexer        import NovaScriptLexer
+from parser       import NovaScriptParser
 from semantic     import SemanticAnalyzer
 from interpreter  import Interpreter
 from error_handler import error_handler
@@ -48,7 +48,7 @@ _load_google_key()
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="MiniLang Compiler",
+    page_title="NovaScript Compiler",
     page_icon="🖥️",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -108,7 +108,7 @@ EXAMPLES = {
         "end"
     ),
     "Comprehensive": (
-        "-- Comprehensive MiniLang demo\n"
+        "-- Comprehensive NovaScript demo\n"
         "let x = 10\n"
         "let y = 20\n"
         'display "Sum:" x + y\n\n'
@@ -528,22 +528,22 @@ def _extract_symbol_table(interp) -> dict:
     return sym
 
 
-def run_minilang(source: str) -> dict:
+def run_novascript(source: str) -> dict:
     """
     Run *source* through all four compiler phases.
     Returns a dict with keys: tokens, ast, errors, warnings,
                                output, symbol_table, success.
     """
-    # MiniLang grammar requires a NEWLINE token after every statement.
+    # NovaScript grammar requires a NEWLINE token after every statement.
     # Streamlit's text_area may strip the trailing newline, so we restore it.
     if not source.endswith("\n"):
         source += "\n"
 
     error_handler.reset()
 
-    lexer    = MiniLangLexer();  lexer.build()
+    lexer    = NovaScriptLexer();  lexer.build()
     # write_tables=False / debug=False: don't touch the filesystem on cloud
-    parser   = MiniLangParser(); parser.build(write_tables=False, debug=False)
+    parser   = NovaScriptParser(); parser.build(write_tables=False, debug=False)
     semantic = SemanticAnalyzer()
     interp   = Interpreter()
 
@@ -626,7 +626,7 @@ def run_minilang(source: str) -> dict:
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.title("🖥️ MiniLang")
+    st.title("🖥️ NovaScript")
     st.caption("CIT4004 · University of Technology, Jamaica")
     st.markdown("---")
 
@@ -655,17 +655,17 @@ with st.sidebar:
             st.success("Key applied for this session!", icon="✅")
 
     st.markdown("---")
-    st.caption("**MiniLang Compiler v1.0**")
+    st.caption("**NovaScript Compiler v1.0**")
     st.caption("Lexer → Parser → Semantic → Interpreter")
     st.caption("AI powered by Google Gemini (free tier)")
 
 # ── Main layout ───────────────────────────────────────────────────────────────
-st.title("🖥️ MiniLang Compiler — Cloud Edition")
-st.caption("Type MiniLang code below, then press **▶ Run** to compile and execute.")
+st.title("🖥️ NovaScript Compiler — Cloud Edition")
+st.caption("Type NovaScript code below, then press **▶ Run** to compile and execute.")
 
 # Initialise session state
 if "code" not in st.session_state:
-    st.session_state.code = '-- Welcome to MiniLang!\ndisplay "Hello, World!"'
+    st.session_state.code = '-- Welcome to NovaScript!\ndisplay "Hello, World!"'
 if "result" not in st.session_state:
     st.session_state.result = None
 
@@ -703,7 +703,7 @@ if clear_clicked:
 
 if run_clicked:
     st.session_state.code   = code_input
-    st.session_state.result = run_minilang(code_input)
+    st.session_state.result = run_novascript(code_input)
 
 # ── Results tabs ──────────────────────────────────────────────────────────────
 result = st.session_state.result
@@ -777,7 +777,7 @@ if result is not None:
     with tab_pt:
         st.caption(
             "The **Parse Tree** shows the grammar-level structure of the program, "
-            "including keyword terminals (grey nodes) that appear in the MiniLang grammar."
+            "including keyword terminals (grey nodes) that appear in the NovaScript grammar."
         )
         _render_tree_tab(result.get("ast"), "parse")
 
@@ -825,8 +825,8 @@ if result is not None:
 
             # Free-text question
             question = st.text_input(
-                "Ask a question about MiniLang or your code:",
-                placeholder="e.g. How do I use a for loop in MiniLang?",
+                "Ask a question about NovaScript or your code:",
+                placeholder="e.g. How do I use a for loop in NovaScript?",
             )
             ask_clicked = st.button("Ask ↵", type="primary")
 
@@ -842,10 +842,10 @@ if result is not None:
 
             if explain_clicked:
                 if not q_code:
-                    st.warning("Write some MiniLang code first, then press Run.")
+                    st.warning("Write some NovaScript code first, then press Run.")
                 else:
                     prompt_to_send = (
-                        "Explain what this MiniLang program does, step by step. "
+                        "Explain what this NovaScript program does, step by step. "
                         "Aim for a first-year student audience."
                     )
             elif error_clicked:
@@ -853,7 +853,7 @@ if result is not None:
                     st.warning("No errors found — run the program first (▶ Run).")
                 else:
                     prompt_to_send = (
-                        "Explain each of these MiniLang errors in plain language "
+                        "Explain each of these NovaScript errors in plain language "
                         "and tell me exactly how to fix them."
                     )
             elif fix_clicked:
@@ -861,7 +861,7 @@ if result is not None:
                     st.warning("No errors detected — run the program first (▶ Run).")
                 else:
                     prompt_to_send = (
-                        "Fix all the errors in this MiniLang code. "
+                        "Fix all the errors in this NovaScript code. "
                         "Show the complete corrected program and briefly explain every change."
                     )
             elif ask_clicked and question.strip():
@@ -886,14 +886,14 @@ if result is not None:
 else:
     # No result yet — show a tip
     st.info(
-        "👆  Type or load MiniLang code above, then press **▶ Run** to compile and execute.",
+        "👆  Type or load NovaScript code above, then press **▶ Run** to compile and execute.",
         icon="💡",
     )
 
 # ── Footer ────────────────────────────────────────────────────────────────────
 st.markdown("---")
 st.caption(
-    "MiniLang Compiler · CIT4004 Analysis of Programming Languages · "
+    "NovaScript Compiler · CIT4004 Analysis of Programming Languages · "
     "University of Technology, Jamaica · "
     "AI powered by Google Gemini free tier"
 )

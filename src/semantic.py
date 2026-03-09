@@ -1,5 +1,5 @@
 """
-Semantic analyzer for MiniLang.
+Semantic analyzer for NovaScript.
 Performs type checking, scope resolution, and semantic validation.
 """
 

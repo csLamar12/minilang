@@ -1,30 +1,30 @@
 #!/usr/bin/env python3
 """
-MiniLang Compiler and Interpreter
-Main entry point for the MiniLang programming language.
+NovaScript Compiler and Interpreter
+Main entry point for the NovaScript programming language.
 """
 
 import sys
 import os
 import argparse
-from lexer import MiniLangLexer
-from parser import MiniLangParser
+from lexer import NovaScriptLexer
+from parser import NovaScriptParser
 from semantic import SemanticAnalyzer
 from interpreter import Interpreter
 from error_handler import error_handler
 
-class MiniLangCompiler:
+class NovaScriptCompiler:
     """Main compiler class that orchestrates all phases."""
     
     def __init__(self):
-        self.lexer = MiniLangLexer()
-        self.parser = MiniLangParser()
+        self.lexer = NovaScriptLexer()
+        self.parser = NovaScriptParser()
         self.semantic = SemanticAnalyzer()
         self.interpreter = Interpreter()
     
     def compile_and_run(self, source_code, filename="<stdin>"):
         """
-        Compile and run MiniLang source code.
+        Compile and run NovaScript source code.
         
         Args:
             source_code: String containing the source code
@@ -143,7 +143,7 @@ class MiniLangCompiler:
     def run_repl(self):
         """Run the interactive REPL (Read-Eval-Print Loop)."""
         print("\n" + "="*60)
-        print("MiniLang REPL v1.0")
+        print("NovaScript REPL v1.0")
         print("Type 'exit()' to quit, 'clear()' to clear screen")
         print("Use '\\' at end of a line to continue on the next line")
         print("="*60)
@@ -182,8 +182,8 @@ class MiniLangCompiler:
 
                 # ── reset ALL state before each run (fixes error accumulation) ──
                 error_handler.reset()
-                self.lexer       = MiniLangLexer();  self.lexer.build()
-                self.parser      = MiniLangParser(); self.parser.build()
+                self.lexer       = NovaScriptLexer();  self.lexer.build()
+                self.parser      = NovaScriptParser(); self.parser.build()
                 self.semantic    = SemanticAnalyzer()
                 self.interpreter = Interpreter()
 
@@ -204,13 +204,13 @@ class MiniLangCompiler:
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description='MiniLang Compiler and Interpreter',
+        description='NovaScript Compiler and Interpreter',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python main.py examples/if_example.mini    # Run a file
+  python main.py examples/if_example.nova    # Run a file
   python main.py -i                          # Start interactive REPL
-  python main.py -v examples/loop_examples.mini  # Run with verbose output
+  python main.py -v examples/loop_examples.nova  # Run with verbose output
         """
     )
     
@@ -235,7 +235,7 @@ Examples:
     args = parser.parse_args()
     
     # Create compiler instance
-    compiler = MiniLangCompiler()
+    compiler = NovaScriptCompiler()
     
     # Run in appropriate mode
     if args.interactive or not args.file:

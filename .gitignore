@@ -23,7 +23,7 @@ ENV/
 .env.*
 *.key
 secrets.py
-.minilang_config.json        # local API key storage (config_manager.py)
+.novascript_config.json        # local API key storage (config_manager.py)
 .streamlit/secrets.toml      # Streamlit Cloud secrets — keep local only
 
 # ── IDE / OS ──────────────────────────────────────────────────────────────────
@@ -34,6 +34,12 @@ secrets.py
 .DS_Store
 Thumbs.db
 
-# ── MiniLang output / temp ────────────────────────────────────────────────────
-*.mini.out
+# ── Project docs (internal use only) ─────────────────────────────────────────
+docs/PROJECT_REPORT.md
+docs/PRESENTATION_GUIDE.md
+docs/TEAM_CONTRIBUTIONS.md
+
+# ── NovaScript output / temp ────────────────────────────────────────────────────
+*.nova.out
+*.ns.out
 *.log

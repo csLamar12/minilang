@@ -1,5 +1,5 @@
 """
-Interpreter for MiniLang.
+Interpreter for NovaScript.
 Executes the AST and produces output.
 """
 

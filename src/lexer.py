@@ -1,13 +1,13 @@
 """
-Lexical analyzer for MiniLang using PLY.
+Lexical analyzer for NovaScript using PLY.
 Fixed version with proper line number reset.
 """
 
 import ply.lex as lex
 from error_handler import error_handler
 
-class MiniLangLexer:
-    """Lexical analyzer for the MiniLang programming language."""
+class NovaScriptLexer:
+    """Lexical analyzer for the NovaScript programming language."""
     
     # List of token names
     tokens = (
@@ -167,7 +167,7 @@ class MiniLangLexer:
 
 # For testing
 if __name__ == '__main__':
-    lexer = MiniLangLexer()
+    lexer = NovaScriptLexer()
     lexer.build()
     
     test_code = """

@@ -1,8 +1,8 @@
 """
-config_manager.py — Persistent local configuration for the MiniLang Compiler.
+config_manager.py — Persistent local configuration for the NovaScript Compiler.
 CIT4004 · University of Technology, Jamaica
 
-Settings are stored in ~/.minilang_config.json on the user's home directory.
+Settings are stored in ~/.novascript_config.json on the user's home directory.
 This file is NEVER committed to git (.gitignore excludes it via *.key / .env rules,
 and the filename itself is outside the repo tree).
 
@@ -19,8 +19,8 @@ import os
 from pathlib import Path
 
 # ── Storage location ──────────────────────────────────────────────────────────
-# ~/.minilang_config.json   (cross-platform: works on macOS, Windows, Linux)
-_CONFIG_PATH = Path.home() / ".minilang_config.json"
+# ~/.novascript_config.json   (cross-platform: works on macOS, Windows, Linux)
+_CONFIG_PATH = Path.home() / ".novascript_config.json"
 
 
 # ── Low-level helpers ─────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Launcher script for MiniLang GUI
+Launcher script for NovaScript GUI
 """
 
 import sys

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-MiniLang Compiler - Graphical User Interface
+NovaScript Compiler - Graphical User Interface
 """
 
 import tkinter as tk
@@ -13,8 +13,8 @@ import queue
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from lexer import MiniLangLexer
-from parser import MiniLangParser
+from lexer import NovaScriptLexer
+from parser import NovaScriptParser
 from semantic import SemanticAnalyzer
 from interpreter import Interpreter
 from error_handler import error_handler
@@ -29,25 +29,25 @@ _ERROR_HELP = {
     'LEXICAL': {
         'default': (
             "A lexical error means the scanner found a character or sequence "
-            "that is not part of the MiniLang alphabet.",
+            "that is not part of the NovaScript alphabet.",
             "Check for typos, unsupported symbols, or unclosed string literals."
         ),
         'Illegal character': (
-            "The character you used is not recognised as part of MiniLang's character set.",
-            "Remove or replace the character. MiniLang supports letters, digits, "
+            "The character you used is not recognised as part of NovaScript's character set.",
+            "Remove or replace the character. NovaScript supports letters, digits, "
             "standard operators, parentheses, and double-quoted strings."
         ),
     },
     'SYNTAX': {
         'default': (
-            "A syntax error means the program's structure does not match MiniLang's grammar.",
+            "A syntax error means the program's structure does not match NovaScript's grammar.",
             "Check that every 'if', 'while', 'for', 'try', and 'begin' block "
             "is closed with 'end', and each statement is on its own line."
         ),
         "Syntax error at '": (
             "The parser found an unexpected token where a different token was expected.",
             "Review the highlighted line. Ensure keywords are spelled correctly "
-            "and the code follows MiniLang grammar."
+            "and the code follows NovaScript grammar."
         ),
         'Syntax error at EOF': (
             "The program ended unexpectedly — most likely a missing 'end' keyword.",
@@ -484,11 +484,11 @@ def _pt_to_tnode(node) -> _TNode:
 # GUI class
 # ============================================================================
 
-class MiniLangGUI:
+class NovaScriptGUI:
 
     def __init__(self, root):
         self.root = root
-        self.root.title("MiniLang Compiler v1.0")
+        self.root.title("NovaScript Compiler v1.0")
         self.root.geometry("1200x800")
 
         self.current_file   = None
@@ -510,8 +510,8 @@ class MiniLangGUI:
 
     # -------------------------------------------------------------------------
     def reset_compiler(self):
-        self.lexer       = MiniLangLexer();  self.lexer.build()
-        self.parser      = MiniLangParser(); self.parser.build()
+        self.lexer       = NovaScriptLexer();  self.lexer.build()
+        self.parser      = NovaScriptParser(); self.parser.build()
         self.semantic    = SemanticAnalyzer()
         self.interpreter = Interpreter()
         self.current_ast = None
@@ -1131,12 +1131,12 @@ class MiniLangGUI:
     def open_settings(self):
         """
         Open the Settings dialog where the user can enter / update their
-        Anthropic API key.  The key is saved to ~/.minilang_config.json so it
+        Anthropic API key.  The key is saved to ~/.novascript_config.json so it
         persists across sessions and machines — no environment variable setup
         required after the first time.
         """
         dlg = tk.Toplevel(self.root)
-        dlg.title("Settings — MiniLang Compiler")
+        dlg.title("Settings — NovaScript Compiler")
         dlg.geometry("560x300")
         dlg.resizable(False, False)
         dlg.transient(self.root)
@@ -1145,7 +1145,7 @@ class MiniLangGUI:
         # ── Header ──────────────────────────────────────────────────────────
         hdr = ttk.Frame(dlg, padding=12)
         hdr.pack(fill=tk.X)
-        ttk.Label(hdr, text="⚙  MiniLang Settings",
+        ttk.Label(hdr, text="⚙  NovaScript Settings",
                   font=('Helvetica', 13, 'bold')).pack(anchor=tk.W)
         ttk.Separator(dlg, orient=tk.HORIZONTAL).pack(fill=tk.X, padx=12)
 
@@ -1216,7 +1216,7 @@ class MiniLangGUI:
             messagebox.showinfo(
                 "Saved",
                 "Google API key saved!  The AI Assistant is now active.\n\n"
-                "Your key is stored in  ~/.minilang_config.json\n"
+                "Your key is stored in  ~/.novascript_config.json\n"
                 "and will be loaded automatically every time you open the app.\n\n"
                 "Free tier: 1,500 requests/day — no credit card needed.",
                 parent=dlg)
@@ -1268,10 +1268,10 @@ class MiniLangGUI:
     def ai_explain_code(self):
         code = self.editor.get('1.0', tk.END).strip()
         if not code:
-            self._ai_display("  No code in editor. Write some MiniLang and try again.", 'error_msg')
+            self._ai_display("  No code in editor. Write some NovaScript and try again.", 'error_msg')
             self.notebook.select(6); return
         self._ai_run_async(
-            "Explain what this MiniLang program does, step by step. "
+            "Explain what this NovaScript program does, step by step. "
             "Aim for a first-year student audience.",
             code=code,
         )
@@ -1286,7 +1286,7 @@ class MiniLangGUI:
             f"{e['type']} at line {e['line']}: {e['message']}" for e in errs
         )
         self._ai_run_async(
-            "Explain each of these MiniLang errors in plain language "
+            "Explain each of these NovaScript errors in plain language "
             "and tell me exactly how to fix them.",
             code=code, error=err_text,
         )
@@ -1301,7 +1301,7 @@ class MiniLangGUI:
             f"{e['type']} at line {e['line']}: {e['message']}" for e in errs
         )
         self._ai_run_async(
-            "Fix all the errors in this MiniLang code. "
+            "Fix all the errors in this NovaScript code. "
             "Show the complete corrected program and briefly explain every change.",
             code=code, error=err_text,
         )
@@ -1328,7 +1328,7 @@ class MiniLangGUI:
         sb = ttk.Frame(self.root); sb.pack(side=tk.BOTTOM, fill=tk.X)
         self.cursor_pos  = ttk.Label(sb, text="Ln 1, Col 1"); self.cursor_pos.pack(side=tk.LEFT, padx=5)
         self.file_status = ttk.Label(sb, text="No file");     self.file_status.pack(side=tk.LEFT, padx=20)
-        ttk.Label(sb, text="MiniLang").pack(side=tk.RIGHT, padx=5)
+        ttk.Label(sb, text="NovaScript").pack(side=tk.RIGHT, padx=5)
 
     def setup_bindings(self):
         self.editor.bind('<<Modified>>', self.on_modified)
@@ -1431,7 +1431,7 @@ class MiniLangGUI:
     # Title / welcome
     # =========================================================================
     def update_title(self):
-        t = "MiniLang Compiler"
+        t = "NovaScript Compiler"
         if self.current_file:
             t += f" - {os.path.basename(self.current_file)}"
             if self.file_modified: t += " *"
@@ -1439,8 +1439,8 @@ class MiniLangGUI:
 
     def show_welcome(self):
         self.editor.delete("1.0", tk.END)
-        self.editor.insert("1.0", """-- MiniLang Programming Language
--- Welcome to the MiniLang Compiler!
+        self.editor.insert("1.0", """-- NovaScript Programming Language
+-- Welcome to the NovaScript Compiler!
 
 -- Example program:
 let name = "World"
@@ -1471,8 +1471,8 @@ display "x + y = " z
         if self.file_modified:
             if not messagebox.askyesno("Unsaved Changes", "Discard changes?"): return
         fn = filedialog.askopenfilename(
-            title="Open MiniLang File",
-            filetypes=[("MiniLang files","*.mini"),("All files","*.*")])
+            title="Open NovaScript File",
+            filetypes=[("NovaScript files","*.nova *.ns"),("All files","*.*")])
         if fn:
             try:
                 with open(fn, 'r', encoding='utf-8') as f: content = f.read()
@@ -1493,8 +1493,8 @@ display "x + y = " z
 
     def save_file_as(self):
         fn = filedialog.asksaveasfilename(
-            title="Save MiniLang File", defaultextension=".mini",
-            filetypes=[("MiniLang files","*.mini"),("All files","*.*")])
+            title="Save NovaScript File", defaultextension=".nova",
+            filetypes=[("NovaScript files","*.nova *.ns"),("All files","*.*")])
         if fn:
             self.current_file = fn
             self.file_status.config(text=os.path.basename(fn))
@@ -1896,7 +1896,7 @@ display "x + y = " z
     # =========================================================================
     def show_quick_ref(self):
         self.show_info("Quick Reference", """
-MINILANG QUICK REFERENCE
+NOVASCRIPT QUICK REFERENCE
 ========================
 
 VARIABLES:
@@ -1944,8 +1944,8 @@ OPERATORS:
 """)
 
     def show_about(self):
-        self.show_info("About MiniLang", """
-MiniLang Compiler v1.0
+        self.show_info("About NovaScript", """
+NovaScript Compiler v1.0
 ======================
 
 CIT4004 - Analysis of Programming Languages
@@ -1981,7 +1981,7 @@ Created: March 2026
 def main():
     root = tk.Tk()
     ttk.Style().theme_use('clam')
-    app = MiniLangGUI(root)
+    app = NovaScriptGUI(root)
     root.update_idletasks()
     w, h = root.winfo_width(), root.winfo_height()
     root.geometry(f"{w}x{h}+{(root.winfo_screenwidth()-w)//2}+{(root.winfo_screenheight()-h)//2}")

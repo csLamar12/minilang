@@ -3,13 +3,13 @@ Usage
 Run a program file:
 
 bash
-python main.py examples/comprehensive_test.mini
+python main.py examples/comprehensive_test.nova
 
 
 Run with verbose output:
 
 bash
-python main.py -v examples/loop_examples.mini
+python main.py -v examples/loop_examples.nova
 
 
 Start interactive REPL:
