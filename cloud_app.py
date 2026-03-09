@@ -138,6 +138,376 @@ EXAMPLES = {
     ),
 }
 
+# ── Tree visualisation helpers ────────────────────────────────────────────────
+import itertools
+
+# Import AST node types (already on sys.path via _SRC)
+import ast_nodes as _AN
+
+
+def _escape_dot(s: str) -> str:
+    """Escape a string for use inside a Graphviz double-quoted label."""
+    return (str(s)
+            .replace("\\", "\\\\")
+            .replace('"',  '\\"')
+            .replace("\n", "\\n")
+            .replace("<",  "\\<")
+            .replace(">",  "\\>")
+            .replace("{",  "\\{")
+            .replace("}",  "\\}"))
+
+
+def _ast_to_dot(root, mode: str = "ast") -> str:
+    """
+    Convert an AST root node to a Graphviz DOT string.
+
+    mode='ast'   → clean semantic tree (structural nodes only)
+    mode='parse' → grammar-level tree (adds keyword terminal children)
+    """
+    counter   = itertools.count()
+    node_defs : list[str] = []
+    edge_defs : list[str] = []
+
+    # Node colour palette
+    _COLORS = {
+        "internal": ("#e07b00", "white",   "box"),       # orange  — structural
+        "expr":     ("#1a6b8a", "white",   "diamond"),   # blue    — operators
+        "literal":  ("#2d7d46", "white",   "ellipse"),   # green   — values
+        "leaf":     ("#5a5a7a", "white",   "ellipse"),   # grey    — terminals
+    }
+
+    def _node(nid: int, label: str, kind: str = "internal"):
+        color, font, shape = _COLORS.get(kind, _COLORS["internal"])
+        node_defs.append(
+            f'  n{nid} [label="{_escape_dot(label)}" shape={shape} '
+            f'style=filled fillcolor="{color}" fontcolor="{font}"];'
+        )
+
+    def _leaf(parent: int, text: str):
+        nid = next(counter)
+        _node(nid, text, "leaf")
+        edge_defs.append(f"  n{parent} -> n{nid};")
+
+    def _edge(parent: int, child):
+        if child is not None:
+            edge_defs.append(f"  n{parent} -> n{child};")
+
+    def _body(parent: int, stmts, label: str = "body"):
+        bid = next(counter)
+        _node(bid, label, "internal")
+        edge_defs.append(f"  n{parent} -> n{bid};")
+        for s in (stmts or []):
+            _edge(bid, _visit(s))
+        return bid
+
+    def _visit(node) -> "int | None":
+        if node is None:
+            return None
+        nid = next(counter)
+
+        # ── Structural nodes ────────────────────────────────────────────
+        if isinstance(node, _AN.Program):
+            _node(nid, "Program")
+            for s in (node.statements or []):
+                if isinstance(s, _AN.ASTNode):    # skip stray non-AST items
+                    _edge(nid, _visit(s))
+
+        elif isinstance(node, _AN.Comment):
+            _node(nid, f"-- {str(node.text)[:30]}", "leaf")
+
+        elif isinstance(node, _AN.Block):
+            _node(nid, "begin…end")
+            if mode == "parse": _leaf(nid, "begin")
+            for s in (node.statements or []):
+                _edge(nid, _visit(s))
+            if mode == "parse": _leaf(nid, "end")
+
+        elif isinstance(node, _AN.Declaration):
+            _node(nid, f"let {node.identifier}")
+            if mode == "parse":
+                _leaf(nid, "let"); _leaf(nid, node.identifier); _leaf(nid, "=")
+            _edge(nid, _visit(node.expression))
+
+        elif isinstance(node, _AN.Assignment):
+            _node(nid, f"{node.identifier} =")
+            if mode == "parse":
+                _leaf(nid, node.identifier); _leaf(nid, "=")
+            _edge(nid, _visit(node.expression))
+
+        elif isinstance(node, _AN.Display):
+            _node(nid, "display")
+            if mode == "parse": _leaf(nid, "display")
+            for item in (node.items or []):
+                _edge(nid, _visit(item))
+
+        elif isinstance(node, _AN.If):
+            _node(nid, "if")
+            if mode == "parse": _leaf(nid, "if")
+            _edge(nid, _visit(node.condition))
+            _body(nid, node.then_statements, "then")
+            if node.else_statements:
+                if mode == "parse": _leaf(nid, "else")
+                _body(nid, node.else_statements, "else")
+            if mode == "parse": _leaf(nid, "end")
+
+        elif isinstance(node, _AN.While):
+            _node(nid, "while")
+            if mode == "parse": _leaf(nid, "while")
+            _edge(nid, _visit(node.condition))
+            _body(nid, node.statements)
+            if mode == "parse": _leaf(nid, "end")
+
+        elif isinstance(node, _AN.For):
+            _node(nid, f"for {node.identifier}")
+            if mode == "parse":
+                _leaf(nid, "for"); _leaf(nid, node.identifier); _leaf(nid, "=")
+            _edge(nid, _visit(node.start_expr))
+            if mode == "parse": _leaf(nid, "to")
+            _edge(nid, _visit(node.end_expr))
+            if node.step_expr is not None:
+                if mode == "parse": _leaf(nid, "step")
+                _edge(nid, _visit(node.step_expr))
+            _body(nid, node.statements)
+            if mode == "parse": _leaf(nid, "end")
+
+        elif isinstance(node, _AN.TryCatch):
+            _node(nid, "try/catch")
+            if mode == "parse": _leaf(nid, "try")
+            _body(nid, node.try_statements,   "try-body")
+            if mode == "parse": _leaf(nid, "catch")
+            _body(nid, node.catch_statements, "catch-body")
+            if mode == "parse": _leaf(nid, "end")
+
+        elif isinstance(node, _AN.Break):
+            _node(nid, "break", "leaf")
+
+        elif isinstance(node, _AN.Expression):
+            return _visit(node.expression)   # transparent wrapper
+
+        # ── Expression nodes ────────────────────────────────────────────
+        elif isinstance(node, _AN.BinaryOp):
+            _node(nid, node.op, "expr")
+            _edge(nid, _visit(node.left))
+            _edge(nid, _visit(node.right))
+
+        elif isinstance(node, _AN.UnaryOp):
+            _node(nid, f"unary {node.op}", "expr")
+            _edge(nid, _visit(node.expr))
+
+        # ── Leaf / value nodes ──────────────────────────────────────────
+        elif isinstance(node, _AN.Identifier):
+            _node(nid, f"id: {node.name}", "literal")
+
+        elif isinstance(node, _AN.IntegerLiteral):
+            _node(nid, str(node.value), "literal")
+
+        elif isinstance(node, _AN.FloatLiteral):
+            _node(nid, str(node.value), "literal")
+
+        elif isinstance(node, _AN.StringLiteral):
+            v = node.value[:20] + ("…" if len(node.value) > 20 else "")
+            _node(nid, f'"{v}"', "literal")
+
+        elif isinstance(node, _AN.BooleanLiteral):
+            _node(nid, str(node.value).lower(), "literal")
+
+        else:
+            _node(nid, type(node).__name__)
+
+        return nid
+
+    _visit(root)
+
+    return (
+        "digraph G {\n"
+        "  rankdir=TB;\n"
+        "  node [fontname=\"Courier\" fontsize=10];\n"
+        "  edge [arrowsize=0.7];\n"
+        + "\n".join(node_defs) + "\n"
+        + "\n".join(edge_defs) + "\n"
+        "}"
+    )
+
+
+def _ast_to_text(root, mode: str = "ast") -> str:
+    """
+    Return a Unicode-art indented text representation of the AST.
+    mode: 'ast' = clean, 'parse' = shows grammar keyword children.
+    """
+    PAD = "  "
+    lines: list[str] = []
+
+    def _kw(parent_lines, ind, text):
+        if mode == "parse":
+            parent_lines.append(PAD * ind + f"  ⬡ {text}")
+
+    def _visit(node, ind: int):
+        if node is None:
+            return
+        p = PAD * ind
+
+        if isinstance(node, _AN.Program):
+            lines.append(p + "📦 Program")
+            for s in (node.statements or []):
+                if isinstance(s, _AN.ASTNode):    # skip stray non-AST items
+                    _visit(s, ind + 1)
+
+        elif isinstance(node, _AN.Comment):
+            lines.append(p + f"💬 Comment: {str(node.text)[:50]}")
+
+        elif isinstance(node, _AN.Block):
+            lines.append(p + "🔷 Block (begin…end)")
+            _kw(lines, ind, "begin")
+            for s in (node.statements or []):
+                _visit(s, ind + 1)
+            _kw(lines, ind, "end")
+
+        elif isinstance(node, _AN.Declaration):
+            lines.append(p + f"📝 Declaration  let {node.identifier}")
+            _kw(lines, ind, "let"); _kw(lines, ind, node.identifier)
+            _kw(lines, ind, "=")
+            _visit(node.expression, ind + 1)
+
+        elif isinstance(node, _AN.Assignment):
+            lines.append(p + f"✏️  Assignment  {node.identifier} =")
+            _kw(lines, ind, node.identifier); _kw(lines, ind, "=")
+            _visit(node.expression, ind + 1)
+
+        elif isinstance(node, _AN.Display):
+            lines.append(p + "🖨  Display")
+            _kw(lines, ind, "display")
+            for item in (node.items or []):
+                _visit(item, ind + 1)
+
+        elif isinstance(node, _AN.If):
+            lines.append(p + "🔀 If")
+            _kw(lines, ind, "if")
+            lines.append(PAD * (ind + 1) + "▸ condition")
+            _visit(node.condition, ind + 2)
+            lines.append(PAD * (ind + 1) + "▸ then")
+            for s in (node.then_statements or []):
+                _visit(s, ind + 2)
+            if node.else_statements:
+                _kw(lines, ind, "else")
+                lines.append(PAD * (ind + 1) + "▸ else")
+                for s in node.else_statements:
+                    _visit(s, ind + 2)
+            _kw(lines, ind, "end")
+
+        elif isinstance(node, _AN.While):
+            lines.append(p + "🔁 While")
+            _kw(lines, ind, "while")
+            lines.append(PAD * (ind + 1) + "▸ condition")
+            _visit(node.condition, ind + 2)
+            lines.append(PAD * (ind + 1) + "▸ body")
+            for s in (node.statements or []):
+                _visit(s, ind + 2)
+            _kw(lines, ind, "end")
+
+        elif isinstance(node, _AN.For):
+            lines.append(p + f"🔂 For  {node.identifier}")
+            _kw(lines, ind, "for"); _kw(lines, ind, node.identifier)
+            _kw(lines, ind, "=")
+            lines.append(PAD * (ind + 1) + "▸ start"); _visit(node.start_expr, ind + 2)
+            _kw(lines, ind, "to")
+            lines.append(PAD * (ind + 1) + "▸ end");   _visit(node.end_expr,   ind + 2)
+            if node.step_expr is not None:
+                _kw(lines, ind, "step")
+                lines.append(PAD * (ind + 1) + "▸ step"); _visit(node.step_expr, ind + 2)
+            lines.append(PAD * (ind + 1) + "▸ body")
+            for s in (node.statements or []):
+                _visit(s, ind + 2)
+            _kw(lines, ind, "end")
+
+        elif isinstance(node, _AN.TryCatch):
+            lines.append(p + "🛡  TryCatch")
+            _kw(lines, ind, "try")
+            lines.append(PAD * (ind + 1) + "▸ try-body")
+            for s in (node.try_statements or []):
+                _visit(s, ind + 2)
+            _kw(lines, ind, "catch")
+            lines.append(PAD * (ind + 1) + "▸ catch-body")
+            for s in (node.catch_statements or []):
+                _visit(s, ind + 2)
+            _kw(lines, ind, "end")
+
+        elif isinstance(node, _AN.Break):
+            lines.append(p + "⛔ Break")
+
+        elif isinstance(node, _AN.Expression):
+            _visit(node.expression, ind)   # transparent wrapper
+
+        elif isinstance(node, _AN.BinaryOp):
+            lines.append(p + f"⚙  BinaryOp  {node.op}")
+            _visit(node.left,  ind + 1)
+            _visit(node.right, ind + 1)
+
+        elif isinstance(node, _AN.UnaryOp):
+            lines.append(p + f"⚙  UnaryOp  {node.op}")
+            _visit(node.expr, ind + 1)
+
+        elif isinstance(node, _AN.Identifier):
+            lines.append(p + f"🔑 id: {node.name}")
+
+        elif isinstance(node, _AN.IntegerLiteral):
+            lines.append(p + f"🔢 int: {node.value}")
+
+        elif isinstance(node, _AN.FloatLiteral):
+            lines.append(p + f"🔢 float: {node.value}")
+
+        elif isinstance(node, _AN.StringLiteral):
+            v = node.value[:40] + ("…" if len(node.value) > 40 else "")
+            lines.append(p + f'🔤 str: "{v}"')
+
+        elif isinstance(node, _AN.BooleanLiteral):
+            lines.append(p + f"🔵 bool: {node.value}")
+
+        else:
+            lines.append(p + f"? {type(node).__name__}")
+
+    _visit(root, 0)
+    return "\n".join(lines)
+
+
+def _render_tree_tab(ast_root, tab_label: str):
+    """
+    Render a Parse Tree or AST tab with Visual / Text view toggle.
+    tab_label: 'parse' or 'ast'  (controls which DOT/text mode is used)
+    """
+    if ast_root is None:
+        st.info("Tree not available — run the program first (▶ Run).")
+        return
+
+    view = st.radio(
+        "View",
+        ["🌲 Visual (diagram)", "📝 Text (indented)"],
+        horizontal=True,
+        label_visibility="collapsed",
+        key=f"view_mode_{tab_label}",
+    )
+
+    mode = "parse" if tab_label == "parse" else "ast"
+
+    if view == "🌲 Visual (diagram)":
+        try:
+            dot_src = _ast_to_dot(ast_root, mode=mode)
+            st.graphviz_chart(dot_src, use_container_width=True)
+        except Exception as exc:
+            st.error(f"Could not render diagram: {exc}")
+            st.code(_ast_to_text(ast_root, mode=mode), language="text")
+
+        # Legend
+        st.caption(
+            "🟧 Orange = structural node  |  "
+            "🔷 Blue = operator  |  "
+            "🟩 Green = value/identifier  |  "
+            + ("🔘 Grey = grammar terminal" if mode == "parse" else "")
+        )
+    else:
+        txt = _ast_to_text(ast_root, mode=mode)
+        st.code(txt, language="text")
+
+
 # ── Compiler helper ────────────────────────────────────────────────────────────
 def _extract_symbol_table(interp) -> dict:
     """
@@ -339,8 +709,10 @@ if run_clicked:
 result = st.session_state.result
 
 if result is not None:
-    tab_out, tab_err, tab_tok, tab_sym, tab_ai = st.tabs(
-        ["📤 Output", "❌ Errors", "🔤 Tokens", "📋 Symbol Table", "🤖 AI Assistant"]
+    tab_out, tab_err, tab_tok, tab_pt, tab_ast, tab_sym, tab_ai = st.tabs(
+        ["📤 Output", "❌ Errors", "🔤 Tokens",
+         "🌳 Parse Tree", "🌿 AST",
+         "📋 Symbol Table", "🤖 AI Assistant"]
     )
 
     # ── Output ────────────────────────────────────────────────────────────────
@@ -400,6 +772,23 @@ if result is not None:
                         for i, t in enumerate(tokens)]
                 st.dataframe(pd.DataFrame(rows), use_container_width=True,
                              hide_index=True)
+
+    # ── Parse Tree ────────────────────────────────────────────────────────────
+    with tab_pt:
+        st.caption(
+            "The **Parse Tree** shows the grammar-level structure of the program, "
+            "including keyword terminals (grey nodes) that appear in the MiniLang grammar."
+        )
+        _render_tree_tab(result.get("ast"), "parse")
+
+    # ── AST ───────────────────────────────────────────────────────────────────
+    with tab_ast:
+        st.caption(
+            "The **Abstract Syntax Tree** is a clean, simplified view of the program "
+            "structure — redundant grammar symbols are removed, leaving only semantically "
+            "meaningful nodes."
+        )
+        _render_tree_tab(result.get("ast"), "ast")
 
     # ── Symbol Table ──────────────────────────────────────────────────────────
     with tab_sym:
