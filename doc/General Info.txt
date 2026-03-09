@@ -1,0 +1,41 @@
+Usage
+
+Run a program file:
+
+bash
+python main.py examples/comprehensive_test.mini
+
+
+Run with verbose output:
+
+bash
+python main.py -v examples/loop_examples.mini
+
+
+Start interactive REPL:
+
+bash
+python main.py -i
+
+
+Example Program
+
+mini
+-- Calculate factorial
+let n = 5
+let result = 1
+
+while n > 0
+    result = result * n
+    n = n - 1
+end
+
+display "Factorial = " result
+
+-- Exception handling example
+try
+    let x = 10 / 0
+catch
+    display "Division by zero caught!"
+end
+

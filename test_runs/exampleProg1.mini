@@ -1,0 +1,15 @@
+-- MiniLang Programming Language
+-- Welcome to the MiniLang Compiler!
+
+-- Example program:
+let name = "World"
+display "Hello, " name
+
+let x = 10
+let y = 20
+let z = x + y
+display "x + y = " z
+
+-- Try running this program (F5)
+-- Check the documentation for more examples
+

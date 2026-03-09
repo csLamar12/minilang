@@ -1,0 +1,119 @@
+================================================================================
+MINILANG GRAMMAR (BNF)
+================================================================================
+
+<program>              ::= <statement_list>
+
+<statement_list>       ::= <statement> | <statement> <statement_list>
+
+<statement>            ::= <comment> NEWLINE
+                         | <declaration_stmt> NEWLINE
+                         | <assignment_stmt> NEWLINE
+                         | <display_stmt> NEWLINE
+                         | <try_catch_stmt>
+                         | <if_stmt>
+                         | <while_stmt>
+                         | <for_stmt>
+                         | <break_stmt> NEWLINE
+                         | <expression_stmt> NEWLINE
+                         | <block_stmt>
+                         | NEWLINE
+
+<comment>              ::= "--" <text_until_newline>
+
+<block_stmt>           ::= "begin" NEWLINE <statement_list> "end" NEWLINE
+
+<declaration_stmt>     ::= "let" <identifier> "=" <expression>
+
+<assignment_stmt>      ::= <identifier> "=" <expression>
+
+<display_stmt>         ::= "display" <display_list>
+
+<display_list>         ::= <display_item> | <display_item> <display_list>
+
+<display_item>         ::= <string_literal> | <identifier> | <expression>
+
+<try_catch_stmt>       ::= "try" NEWLINE <statement_list> 
+                           "catch" NEWLINE <statement_list> "end"
+
+<if_stmt>              ::= "if" <expression> NEWLINE <statement_list> 
+                           <else_part> "end"
+
+<else_part>            ::= "else" NEWLINE <statement_list> | <empty>
+
+<while_stmt>           ::= "while" <expression> NEWLINE <statement_list> "end"
+
+<for_stmt>             ::= "for" <identifier> "=" <expression> "to" <expression> 
+                           <step_part> NEWLINE <statement_list> "end"
+
+<step_part>            ::= "step" <expression> | <empty>
+
+<break_stmt>           ::= "break"
+
+<expression>           ::= <logical_expr>
+
+<logical_expr>         ::= <relational_expr>
+                         | <logical_expr> "and" <relational_expr>
+                         | <logical_expr> "or" <relational_expr>
+
+<relational_expr>      ::= <additive_expr>
+                         | <relational_expr> "==" <additive_expr>
+                         | <relational_expr> "!=" <additive_expr>
+                         | <relational_expr> "<" <additive_expr>
+                         | <relational_expr> ">" <additive_expr>
+                         | <relational_expr> "<=" <additive_expr>
+                         | <relational_expr> ">=" <additive_expr>
+
+<additive_expr>        ::= <multiplicative_expr>
+                         | <additive_expr> "+" <multiplicative_expr>
+                         | <additive_expr> "-" <multiplicative_expr>
+
+<multiplicative_expr>  ::= <unary_expr>
+                         | <multiplicative_expr> "*" <unary_expr>
+                         | <multiplicative_expr> "/" <unary_expr>
+                         | <multiplicative_expr> "%" <unary_expr>
+
+<unary_expr>           ::= <primary_expr>
+                         | "+" <unary_expr>
+                         | "-" <unary_expr>
+                         | "not" <unary_expr>
+
+<primary_expr>         ::= <identifier>
+                         | <literal>
+                         | "(" <expression> ")"
+                         | <boolean_literal>
+
+<literal>              ::= <integer_literal>
+                         | <float_literal>
+                         | <string_literal>
+
+<boolean_literal>      ::= "true" | "false"
+
+<integer_literal>      ::= <digit> | <digit> <integer_literal>
+
+<float_literal>        ::= <integer_literal> "." <integer_literal>
+
+<string_literal>       ::= '"' <string_content> '"'
+
+<string_content>       ::= <empty> | <char> <string_content>
+
+<identifier>           ::= <letter> | <identifier> <letter> 
+                         | <identifier> <digit> | <identifier> "_"
+
+<letter>               ::= "A"|"B"|...|"Z"|"a"|"b"|...|"z"
+
+<digit>                ::= "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
+
+<char>                 ::= <letter> | <digit> | <special_char>
+
+<special_char>         ::= " " | "!" | "?" | "." | "," | ":" | "+" | "-" 
+                         | "*" | "/" | "%" | "=" | "<" | ">" | "_"
+                         | "(" | ")" | "[" | "]" | "{" | "}"
+
+<text_until_newline>   ::= <empty> | <char_no_newline> <text_until_newline>
+
+<char_no_newline>      ::= <letter> | <digit> | <special_char>
+
+<newline>              ::= "\n"
+
+<empty>                ::=

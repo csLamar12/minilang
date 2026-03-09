@@ -1,0 +1,29 @@
+-- Example: Exception handling
+display "Division by zero example:"
+
+try
+    let x = 10
+    let y = 0
+    let result = x / y
+    display "Result:" result
+catch
+    display "Error: Division by zero caught!"
+end
+
+display ""
+display "Program continues after catch."
+
+-- Multiple statements in try
+try
+    display "Inside try block"
+    let a = 5
+    let b = 0
+    let c = a / b
+    display "This won't print"
+catch
+    display "Exception handled!"
+    display "Continuing in catch"
+end
+
+display ""
+display "Program completed successfully."

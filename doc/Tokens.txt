@@ -1,0 +1,52 @@
+================================================================================
+MINILANG TOKENS
+================================================================================
+
+KEYWORDS:
+---------
+LET         - "let"        - Variable declaration
+DISPLAY     - "display"    - Output statement
+TRY         - "try"        - Exception handling start
+CATCH       - "catch"      - Exception handler
+IF          - "if"         - Conditional statement
+ELSE        - "else"       - Alternative conditional
+WHILE       - "while"      - While loop
+FOR         - "for"        - For loop
+TO          - "to"         - For loop range
+STEP        - "step"       - For loop step
+BEGIN       - "begin"      - Block start
+END         - "end"        - Block end
+BREAK       - "break"      - Loop exit
+NOT         - "not"        - Logical negation
+AND         - "and"        - Logical AND
+OR          - "or"         - Logical OR
+
+OPERATORS:
+----------
+PLUS        - "+"          - Addition
+MINUS       - "-"          - Subtraction
+TIMES       - "*"          - Multiplication
+DIVIDE      - "/"          - Division
+MODULO      - "%"          - Modulo
+ASSIGN      - "="          - Assignment
+EQ          - "=="         - Equal comparison
+NEQ         - "!="         - Not equal
+LT          - "<"          - Less than
+GT          - ">"          - Greater than
+LE          - "<="         - Less than or equal
+GE          - ">="         - Greater than or equal
+
+LITERALS:
+---------
+IDENTIFIER  - [a-zA-Z_][a-zA-Z0-9_]*  - Variable names
+INTEGER     - [0-9]+                   - Integer numbers
+FLOAT       - [0-9]+\.[0-9]+           - Floating point numbers
+STRING      - "[^"\n]*"                - String literals
+BOOLEAN     - "true"|"false"           - Boolean values
+
+SYMBOLS:
+--------
+LPAREN      - "("          - Left parenthesis
+RPAREN      - ")"          - Right parenthesis
+COMMENT     - "--"         - Comment start
+NEWLINE     - "\n"         - Line terminator

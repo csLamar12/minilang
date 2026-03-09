@@ -1,0 +1,5 @@
+1) LLM Integration 
+2) Stop Parse Tree from showing str
+3) Token tab output (\n (excluding - idea)show different between meaningful and non-meaningful tokens) 
+4) Clean up the documentation 
+5) Cloud hosting

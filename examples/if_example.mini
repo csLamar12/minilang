@@ -1,0 +1,27 @@
+-- Example: If statements
+let x = 15
+let y = 10
+
+if x > y
+    display "x is greater than y"
+    display "x =" x
+else
+    display "x is not greater than y"
+end
+
+display ""
+
+let score = 85
+if score >= 90
+    display "Grade: A"
+else
+    if score >= 80
+        display "Grade: B"
+    else
+        if score >= 70
+            display "Grade: C"
+        else
+            display "Grade: F"
+        end
+    end
+end

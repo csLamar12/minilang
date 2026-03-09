@@ -1,0 +1,17 @@
+-- Simple test program
+let x = 10
+let y = 20
+let z = x + y
+
+display "x + y = " z
+
+if z > 25
+	display "z is greater than 25"
+else
+    display "z is not greater than 25"
+end
+
+
+
+
+

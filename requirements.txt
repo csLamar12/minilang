@@ -1,0 +1,17 @@
+# MiniLang Compiler — Python dependencies
+# Install with:  pip install -r requirements.txt
+
+# Lexer / parser engine
+ply>=3.11
+
+# LLM integration (AI Assistant) — FREE tier, no credit card needed
+# Get a free API key at https://aistudio.google.com/app/apikey
+# NOTE: use 'google-genai', NOT the deprecated 'google-generativeai'
+google-genai>=0.5.0
+
+# Cloud / web interface (Streamlit)
+# Deploy for free at https://streamlit.io/cloud
+streamlit>=1.35.0
+
+# GUI is built on tkinter which ships with Python — no extra install needed.
+# The Streamlit cloud app does NOT require tkinter.
