@@ -139,18 +139,43 @@ EXAMPLES = {
 }
 
 # ── Compiler helper ────────────────────────────────────────────────────────────
+def _extract_symbol_table(interp) -> dict:
+    """
+    Convert the interpreter's SymbolTable object into a plain dict.
+    SymbolTable stores variables in a list of scope dicts; we flatten
+    them all (inner scopes shadow outer ones, matching runtime behaviour).
+    """
+    sym = {}
+    if not hasattr(interp, "symbol_table"):
+        return sym
+    st = interp.symbol_table
+    if hasattr(st, "scopes"):                 # SymbolTable with scope stack
+        for scope in st.scopes:
+            for name, symbol in scope.items():
+                sym[name] = symbol.value if hasattr(symbol, "value") else symbol
+    elif isinstance(st, dict):                # plain dict fallback
+        sym = {k: v for k, v in st.items()}
+    return sym
+
+
 def run_minilang(source: str) -> dict:
     """
     Run *source* through all four compiler phases.
     Returns a dict with keys: tokens, ast, errors, warnings,
                                output, symbol_table, success.
     """
+    # MiniLang grammar requires a NEWLINE token after every statement.
+    # Streamlit's text_area may strip the trailing newline, so we restore it.
+    if not source.endswith("\n"):
+        source += "\n"
+
     error_handler.reset()
 
-    lexer     = MiniLangLexer();  lexer.build()
-    parser    = MiniLangParser(); parser.build()
-    semantic  = SemanticAnalyzer()
-    interp    = Interpreter()
+    lexer    = MiniLangLexer();  lexer.build()
+    # write_tables=False / debug=False: don't touch the filesystem on cloud
+    parser   = MiniLangParser(); parser.build(write_tables=False, debug=False)
+    semantic = SemanticAnalyzer()
+    interp   = Interpreter()
 
     result = {
         "tokens":       [],
@@ -179,7 +204,6 @@ def run_minilang(source: str) -> dict:
     try:
         ast = parser.parse(source)
     except Exception as exc:
-        error_handler.reset()
         result["errors"].append({"type": "SYNTAX", "line": 0,
                                   "message": str(exc)})
         return result
@@ -210,13 +234,12 @@ def run_minilang(source: str) -> dict:
         buf = io.StringIO()
         with redirect_stdout(buf):
             interp.interpret(ast)
-        # Also grab interpreter's internal buffer (display statements)
+        # Grab interpreter's internal output_buffer (display statements)
         captured = buf.getvalue()
         internal = interp.get_output() if hasattr(interp, "get_output") else ""
-        # Merge both (avoid duplicates when interpreter also calls print)
+        # Use whichever has content (they may overlap — prefer captured stdout)
         result["output"] = captured if captured.strip() else internal
-        result["symbol_table"] = dict(interp.symbol_table) if hasattr(
-            interp, "symbol_table") else {}
+        result["symbol_table"] = _extract_symbol_table(interp)
     except Exception as exc:
         result["errors"].append({"type": "RUNTIME", "line": 0,
                                   "message": str(exc)})
@@ -278,8 +301,10 @@ if "result" not in st.session_state:
 
 # Load example if requested
 if load_example and example_choice != "— select —":
-    st.session_state.code = EXAMPLES[example_choice]
-    st.session_state.result = None
+    new_code = EXAMPLES[example_choice]
+    st.session_state.code          = new_code
+    st.session_state["code_editor"] = new_code   # must sync the widget key too
+    st.session_state.result        = None
     st.rerun()
 
 # ── Editor row ────────────────────────────────────────────────────────────────
@@ -301,8 +326,9 @@ with col_run:
     clear_clicked = st.button("🗑  Clear", use_container_width=True)
 
 if clear_clicked:
-    st.session_state.code   = ""
-    st.session_state.result = None
+    st.session_state.code           = ""
+    st.session_state["code_editor"] = ""   # must sync the widget key too
+    st.session_state.result         = None
     st.rerun()
 
 if run_clicked:
