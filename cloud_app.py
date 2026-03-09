@@ -624,6 +624,19 @@ def run_novascript(source: str) -> dict:
     return result
 
 
+# ── Editor callbacks (must be defined before any widget that uses them) ────────
+def _clear_editor():
+    st.session_state.code           = ""
+    st.session_state["code_editor"] = ""
+    st.session_state.result         = None
+
+def _load_example():
+    choice = st.session_state.get("example_sel", "— select —")
+    if choice != "— select —" and choice in EXAMPLES:
+        st.session_state.code           = EXAMPLES[choice]
+        st.session_state["code_editor"] = EXAMPLES[choice]
+        st.session_state.result         = None
+
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.title("🖥️ NovaScript")
@@ -632,8 +645,8 @@ with st.sidebar:
 
     # Example loader
     st.subheader("📂 Load Example")
-    example_choice = st.selectbox("Choose an example", ["— select —"] + list(EXAMPLES))
-    load_example = st.button("Load", use_container_width=True)
+    st.selectbox("Choose an example", ["— select —"] + list(EXAMPLES), key="example_sel")
+    st.button("Load", use_container_width=True, on_click=_load_example)
 
     st.markdown("---")
 
@@ -669,14 +682,6 @@ if "code" not in st.session_state:
 if "result" not in st.session_state:
     st.session_state.result = None
 
-# Load example if requested
-if load_example and example_choice != "— select —":
-    new_code = EXAMPLES[example_choice]
-    st.session_state.code          = new_code
-    st.session_state["code_editor"] = new_code   # must sync the widget key too
-    st.session_state.result        = None
-    st.rerun()
-
 # ── Editor row ────────────────────────────────────────────────────────────────
 col_editor, col_run = st.columns([5, 1])
 
@@ -692,14 +697,8 @@ with col_editor:
 with col_run:
     st.write("")   # vertical spacer
     st.write("")
-    run_clicked   = st.button("▶  Run",   use_container_width=True, type="primary")
-    clear_clicked = st.button("🗑  Clear", use_container_width=True)
-
-if clear_clicked:
-    st.session_state.code           = ""
-    st.session_state["code_editor"] = ""   # must sync the widget key too
-    st.session_state.result         = None
-    st.rerun()
+    run_clicked = st.button("▶  Run",   use_container_width=True, type="primary")
+    st.button("🗑  Clear", use_container_width=True, on_click=_clear_editor)
 
 if run_clicked:
     st.session_state.code   = code_input
