@@ -1,7 +1,16 @@
-"""
-Interpreter for NovaScript.
-Executes the AST and produces output.
-"""
+# File        : interpreter.py
+# Description : Tree-walking interpreter — executes the annotated AST
+# =============================================================================
+# Authors     : Rachjaye Gayle      - 2100400
+#             : Rushane  Green      - 2006930
+#             : Abbygayle Higgins   - 2106327
+#             : Lamar Haye          - 2111690
+# -----------------------------------------------------------------------------
+# Institution : University of Technology, Jamaica
+# Faculty     : School of Computing & Information Technology (FENC)
+# Course      : Analysis of Programming Languages | CIT4004
+# Tutor       : Dr. David White
+# =============================================================================
 
 from ast_nodes import *
 from symbol_table import SymbolTable
@@ -128,7 +137,6 @@ class Interpreter:
                 self.visit(stmt)
         except Exception as e:
             # Execute catch block on exception
-            print(f"Caught exception: {e}")
             self.symbol_table.enter_scope()
             for stmt in node.catch_statements:
                 self.visit(stmt)

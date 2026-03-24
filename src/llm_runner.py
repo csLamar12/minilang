@@ -1,14 +1,16 @@
-"""
-llm_runner.py — LLM integration for the NovaScript Compiler
-CIT4004 · University of Technology, Jamaica
-
-Uses the Google Gemini API (free tier — no credit card required).
-Requires:
-    pip install google-genai
-
-Get a FREE API key at https://aistudio.google.com/app/apikey
-Then save it via Tools -> Settings in the NovaScript app.
-"""
+# File        : llm_runner.py
+# Description : LLM runner for generating code suggestions and explanations/error help
+# =============================================================================
+# Authors     : Rachjaye Gayle      - 2100400
+#             : Rushane  Green      - 2006930
+#             : Abbygayle Higgins   - 2106327
+#             : Lamar Haye          - 2111690
+# -----------------------------------------------------------------------------
+# Institution : University of Technology, Jamaica
+# Faculty     : School of Computing & Information Technology (FENC)
+# Course      : Analysis of Programming Languages | CIT4004
+# Tutor       : Dr. David White
+# =============================================================================
 
 import os
 

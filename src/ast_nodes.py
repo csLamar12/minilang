@@ -1,6 +1,16 @@
-"""
-Abstract Syntax Tree (AST) node definitions for the NovaScript compiler.
-"""
+# File        : ast_nodes.py
+# Description : AST node class definitions for all NovaScript grammar constructs
+# =============================================================================
+# Authors     : Rachjaye Gayle      - 2100400
+#             : Rushane  Green      - 2006930
+#             : Abbygayle Higgins   - 2106327
+#             : Lamar Haye          - 2111690
+# -----------------------------------------------------------------------------
+# Institution : University of Technology, Jamaica
+# Faculty     : School of Computing & Information Technology (FENC)
+# Course      : Analysis of Programming Languages | CIT4004
+# Tutor       : Dr. David White
+# =============================================================================
 
 class ASTNode:
     """Base class for all AST nodes."""
@@ -95,7 +105,7 @@ class For(Statement):
         self.identifier = identifier
         self.start_expr = start_expr
         self.end_expr = end_expr
-        self.step_expr = step_expr if step_expr else IntegerLiteral(1)
+        self.step_expr = step_expr
         self.statements = statements
 
 

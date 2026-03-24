@@ -1,18 +1,16 @@
-"""
-config_manager.py — Persistent local configuration for the NovaScript Compiler.
-CIT4004 · University of Technology, Jamaica
-
-Settings are stored in ~/.novascript_config.json on the user's home directory.
-This file is NEVER committed to git (.gitignore excludes it via *.key / .env rules,
-and the filename itself is outside the repo tree).
-
-Usage:
-    from config_manager import apply_api_key, get_api_key, set_api_key
-
-    apply_api_key()   # call once at startup — injects saved key into env
-    set_api_key(k)    # call from Settings dialog to persist a new key
-    get_api_key()     # returns the currently saved key string (or '')
-"""
+# File        : config_manager.py
+# Description : Persistent local configuration for the NovaScript Compiler
+# =============================================================================
+# Authors     : Rachjaye Gayle      - 2100400
+#             : Rushane  Green      - 2006930
+#             : Abbygayle Higgins   - 2106327
+#             : Lamar Haye          - 2111690
+# -----------------------------------------------------------------------------
+# Institution : University of Technology, Jamaica
+# Faculty     : School of Computing & Information Technology (FENC)
+# Course      : Analysis of Programming Languages | CIT4004
+# Tutor       : Dr. David White
+# =============================================================================
 
 import json
 import os

@@ -1,7 +1,16 @@
-"""
-Semantic analyzer for NovaScript.
-Performs type checking, scope resolution, and semantic validation.
-"""
+# File        : semantic.py
+# Description : Semantic analyzer — type checking, scope, and binding validation
+# =============================================================================
+# Authors     : Rachjaye Gayle      - 2100400
+#             : Rushane  Green      - 2006930
+#             : Abbygayle Higgins   - 2106327
+#             : Lamar Haye          - 2111690
+# -----------------------------------------------------------------------------
+# Institution : University of Technology, Jamaica
+# Faculty     : School of Computing & Information Technology (FENC)
+# Course      : Analysis of Programming Languages | CIT4004
+# Tutor       : Dr. David White
+# =============================================================================
 
 from ast_nodes import *
 from symbol_table import SymbolTable

@@ -1,6 +1,16 @@
-"""
-Error handling for lexical, syntax, and semantic errors.
-"""
+# File        : error_handler.py
+# Description : Centralized error accumulator for all four compiler phases
+# =============================================================================
+# Authors     : Rachjaye Gayle      - 2100400
+#             : Rushane  Green      - 2006930
+#             : Abbygayle Higgins   - 2106327
+#             : Lamar Haye          - 2111690
+# -----------------------------------------------------------------------------
+# Institution : University of Technology, Jamaica
+# Faculty     : School of Computing & Information Technology (FENC)
+# Course      : Analysis of Programming Languages | CIT4004
+# Tutor       : Dr. David White
+# =============================================================================
 
 class ErrorHandler:
     """Centralized error handling with colored output."""

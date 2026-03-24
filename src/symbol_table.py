@@ -1,6 +1,16 @@
-"""
-Symbol table for variable management with scope handling.
-"""
+# File        : symbol_table.py
+# Description : Scoped symbol table implemented as a stack of dictionaries
+# =============================================================================
+# Authors     : Rachjaye Gayle      - 2100400
+#             : Rushane  Green      - 2006930
+#             : Abbygayle Higgins   - 2106327
+#             : Lamar Haye          - 2111690
+# -----------------------------------------------------------------------------
+# Institution : University of Technology, Jamaica
+# Faculty     : School of Computing & Information Technology (FENC)
+# Course      : Analysis of Programming Languages | CIT4004
+# Tutor       : Dr. David White
+# =============================================================================
 
 class Symbol:
     """Represents a variable in the symbol table."""

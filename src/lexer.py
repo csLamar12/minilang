@@ -1,7 +1,16 @@
-"""
-Lexical analyzer for NovaScript using PLY.
-Fixed version with proper line number reset.
-"""
+# File        : lexer.py
+# Description : Lexical analyzer — tokenizes NovaScript source code using PLY
+# =============================================================================
+# Authors     : Rachjaye Gayle      - 2100400
+#             : Rushane  Green      - 2006930
+#             : Abbygayle Higgins   - 2106327
+#             : Lamar Haye          - 2111690
+# -----------------------------------------------------------------------------
+# Institution : University of Technology, Jamaica
+# Faculty     : School of Computing & Information Technology (FENC)
+# Course      : Analysis of Programming Languages | CIT4004
+# Tutor       : Dr. David White
+# =============================================================================
 
 import ply.lex as lex
 from error_handler import error_handler

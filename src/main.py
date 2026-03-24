@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
-"""
-NovaScript Compiler and Interpreter
-Main entry point for the NovaScript programming language.
-"""
+# File        : main.py
+# Description : CLI entry point — runs the compiler pipeline from the terminal
+# =============================================================================
+# Authors     : Rachjaye Gayle      - 2100400
+#             : Rushane  Green      - 2006930
+#             : Abbygayle Higgins   - 2106327
+#             : Lamar Haye          - 2111690
+# -----------------------------------------------------------------------------
+# Institution : University of Technology, Jamaica
+# Faculty     : School of Computing & Information Technology (FENC)
+# Course      : Analysis of Programming Languages | CIT4004
+# Tutor       : Dr. David White
+# =============================================================================
 
 import sys
 import os

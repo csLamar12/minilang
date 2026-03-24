@@ -1,7 +1,17 @@
 #!/usr/bin/env python3
-"""
-NovaScript Compiler - Graphical User Interface
-"""
+# File        : gui.py
+# Description : Graphical user interface for the NovaScript compiler
+# =============================================================================
+# Authors     : Rachjaye Gayle      - 2100400
+#             : Rushane  Green      - 2006930
+#             : Abbygayle Higgins   - 2106327
+#             : Lamar Haye          - 2111690
+# -----------------------------------------------------------------------------
+# Institution : University of Technology, Jamaica
+# Faculty     : School of Computing & Information Technology (FENC)
+# Course      : Analysis of Programming Languages | CIT4004
+# Tutor       : Dr. David White
+# =============================================================================
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
@@ -1668,7 +1678,8 @@ display "x + y = " z
             ins(f"{ni}├─ Then Block\n","node"); self._add_stmt_block(node.then_statements, ni+"│  ", False)
             if node.else_statements:
                 ins(f"{ni}├─ Keyword: else\n","leaf")
-                ins(f"{ni}└─ Else Block\n","node"); self._add_stmt_block(node.else_statements, ni+"   ", True)
+                ins(f"{ni}├─ Else Block\n","node"); self._add_stmt_block(node.else_statements, ni+"│  ", False)
+                ins(f"{ni}└─ Keyword: end\n","leaf")
             else:
                 ins(f"{ni}└─ Keyword: end\n","leaf")
 
@@ -1677,20 +1688,23 @@ display "x + y = " z
             ni = indent + ("   " if is_last else "│  ")
             ins(f"{ni}├─ Keyword: while\n","leaf")
             ins(f"{ni}├─ Condition\n","node"); self._add_expr_tree(node.condition, ni+"│  ", False)
-            ins(f"{ni}└─ Loop Block\n","node"); self._add_stmt_block(node.statements, ni+"   ", True)
+            ins(f"{ni}├─ Loop Block\n","node"); self._add_stmt_block(node.statements, ni+"│  ", False)
+            ins(f"{ni}└─ Keyword: end\n","leaf")
 
         elif nt == "For":
             ins(f"{prefix} For Loop\n","node")
             ni = indent + ("   " if is_last else "│  ")
             ins(f"{ni}├─ Keyword: for\n","leaf")
             ins(f"{ni}├─ Identifier: ","leaf"); ins(f"{node.identifier}\n","value")
+            ins(f"{ni}├─ Operator: =\n","leaf")
             ins(f"{ni}├─ Start\n","node"); self._add_expr_tree(node.start_expr, ni+"│  ", False)
             ins(f"{ni}├─ Keyword: to\n","leaf")
             ins(f"{ni}├─ End\n","node");   self._add_expr_tree(node.end_expr, ni+"│  ", False)
             if node.step_expr:
                 ins(f"{ni}├─ Keyword: step\n","leaf")
                 ins(f"{ni}├─ Step\n","node"); self._add_expr_tree(node.step_expr, ni+"│  ", False)
-            ins(f"{ni}└─ Loop Block\n","node"); self._add_stmt_block(node.statements, ni+"   ", True)
+            ins(f"{ni}├─ Loop Block\n","node"); self._add_stmt_block(node.statements, ni+"│  ", False)
+            ins(f"{ni}└─ Keyword: end\n","leaf")
 
         elif nt == "TryCatch":
             ins(f"{prefix} Try-Catch Statement\n","node")
@@ -1698,7 +1712,8 @@ display "x + y = " z
             ins(f"{ni}├─ Keyword: try\n","leaf")
             ins(f"{ni}├─ Try Block\n","node");   self._add_stmt_block(node.try_statements,   ni+"│  ", False)
             ins(f"{ni}├─ Keyword: catch\n","leaf")
-            ins(f"{ni}└─ Catch Block\n","node"); self._add_stmt_block(node.catch_statements, ni+"   ", True)
+            ins(f"{ni}├─ Catch Block\n","node"); self._add_stmt_block(node.catch_statements, ni+"│  ", False)
+            ins(f"{ni}└─ Keyword: end\n","leaf")
 
         elif nt == "Block":
             ins(f"{prefix} Block\n","node")
